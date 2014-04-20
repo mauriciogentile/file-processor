@@ -83,6 +83,8 @@ namespace BJSS.FileProcessing
                 _fileSystemWatcher.Renamed -= _fileSystemWatcher_Renamed;
                 _fileSystemWatcher.Dispose();
             }
+
+            base.Dispose();
         }
 
         static bool IsFileLocked(string filePath)

@@ -146,6 +146,8 @@ namespace BJSS.FileProcessing
             {
                 _fileSystemWatcher.Dispose();
             }
+
+            base.Dispose();
         }
     }
 }
