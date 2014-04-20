@@ -9,7 +9,7 @@ namespace BJSS.FileProcessing.Test
     public class LocalFileSystem_Test
     {
         [Test]
-        public void exists_should_return_true_if_file_exists()
+        public void exists_should_return_true_if_file_exist()
         {
             var target = new LocalFileSystem();
             var actual = target.Exists(Assembly.GetExecutingAssembly().Location);
@@ -18,7 +18,7 @@ namespace BJSS.FileProcessing.Test
         }
 
         [Test]
-        public void exists_should_return_false_if_file_doesnt_exists()
+        public void exists_should_return_false_if_file_doesnt_exist()
         {
             var target = new LocalFileSystem();
             var exists = target.Exists(Guid.NewGuid().ToString());
@@ -27,12 +27,23 @@ namespace BJSS.FileProcessing.Test
         }
 
         [Test]
-        public void combine_should_behave_like_path_combine()
+        public void combine_should_return_a_combination_of_paths()
         {
             var target = new LocalFileSystem();
 
-            var expected = Path.Combine(Environment.CurrentDirectory, "Momo");
+            var expected = Environment.CurrentDirectory + "\\Momo";
             var actual = target.Combine(Environment.CurrentDirectory, "Momo");
+
+            Assert.AreEqual(expected, actual);
+        }
+
+        [Test]
+        public void get_filename_should_get_file_name_given_a_full_path()
+        {
+            var target = new LocalFileSystem();
+
+            var expected = "Momo.txt";
+            var actual = target.GetFileName(Environment.CurrentDirectory + "\\Momo.txt");
 
             Assert.AreEqual(expected, actual);
         }

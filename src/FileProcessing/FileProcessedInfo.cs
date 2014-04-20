@@ -10,10 +10,10 @@ namespace BJSS.FileProcessing
         public FileProcessedInfo(string inputFile, string outputFile)
         {
             InputFile = inputFile;
-            OutpuFile = outputFile;
+            OutputFile = outputFile;
         }
 
         public string InputFile { get; private set; }
-        public string OutpuFile { get; private set; }
+        public string OutputFile { get; private set; }
     }
 }

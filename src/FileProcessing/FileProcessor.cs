@@ -13,8 +13,8 @@ namespace BJSS.FileProcessing
         readonly IFileWatcher _fileSystemWatcher;
         readonly IFileSystem _fileSystem;
         readonly IFileTransformer _fileTransformer;
+        string _outputPath;
 
-        public string OutputPath { get; protected set; }
         public Action<FileProcessedInfo> FileProcessed { get; set; }
         public Action Started { get; set; }
         public Action Stopped { get; set; }
@@ -79,7 +79,7 @@ namespace BJSS.FileProcessing
                     return;
                 }
 
-                OutputPath = outputPath;
+                _outputPath = outputPath;
 
                 _fileSystemWatcher.Enabled = true;
 
@@ -112,8 +112,8 @@ namespace BJSS.FileProcessing
         {
             try
             {
-                // New file location
-                string newFilePath = _fileSystem.Combine(OutputPath, Path.GetFileName(filePath));
+                // New file location for the output file.
+                string newFilePath = _fileSystem.Combine(_outputPath, _fileSystem.GetFileName(filePath));
 
                 using (var stream = new MemoryStream())
                 {

@@ -40,10 +40,18 @@ namespace BJSS.FileProcessing
         /// Combines an array of strings into a path.
         /// </summary>
         /// <param name="paths"></param>
-        /// <returns></returns>
         public string Combine(params string[] paths)
         {
             return Path.Combine(paths);
+        }
+
+        /// <summary>
+        /// Returns the file name and extension of the specified path.
+        /// </summary>
+        /// <param name="path"></param>
+        public string GetFileName(string path)
+        {
+            return Path.GetFileName(path);
         }
 
         /// <summary>

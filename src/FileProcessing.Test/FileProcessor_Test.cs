@@ -30,6 +30,7 @@ namespace BJSS.FileProcessing.Test
             _fileSystemMock.Setup(x => x.CreateFile(It.IsAny<Stream>(), It.IsAny<string>()));
             _fileSystemMock.Setup(x => x.LocationExists(It.IsAny<string>())).Returns(true);
             _fileSystemMock.Setup(x => x.Exists(It.IsAny<string>())).Returns(true);
+            _fileSystemMock.Setup(x => x.GetFileName(It.IsAny<string>())).Returns<string>((path) => Path.GetFileName(path));
             _fileSystemMock.Setup(x => x.Combine(It.IsAny<string[]>())).Returns<string[]>((paths) => Path.Combine(paths));
         }
 
@@ -157,7 +158,7 @@ namespace BJSS.FileProcessing.Test
 
             target.FileProcessed = file =>
             {
-                actual = file.OutpuFile;
+                actual = file.OutputFile;
                 reseter.Set();
             };
 

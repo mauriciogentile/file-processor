@@ -8,5 +8,6 @@ namespace BJSS.FileProcessing
         bool LocationExists(string locationPath);
         string Combine(params string[] paths);
         void CreateFile(Stream stream, string fileName);
+        string GetFileName(string path);
     }
 }
