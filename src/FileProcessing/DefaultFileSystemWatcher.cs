@@ -84,7 +84,7 @@ namespace BJSS.FileProcessing
                 _fileSystemWatcher.Dispose();
             }
 
-            base.Dispose();
+            base.Dispose(disposing);
         }
 
         static bool IsFileLocked(string filePath)
