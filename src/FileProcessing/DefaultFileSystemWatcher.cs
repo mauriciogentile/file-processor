@@ -85,7 +85,7 @@ namespace BJSS.FileProcessing
             }
         }
 
-        bool IsFileLocked(string filePath)
+        static bool IsFileLocked(string filePath)
         {
             FileStream stream = null;
 
