@@ -68,11 +68,8 @@ namespace BJSS.FileProcessing
                     tries--;
                     Thread.Sleep(100);
                 }
-                if (tries < 0)
-                {
-                    return;
-                }
                 
+                // If file still locked let the process to fail and emit error.
                 FileDetected(filePath);
             }
         }
