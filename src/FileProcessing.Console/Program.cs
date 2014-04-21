@@ -51,7 +51,14 @@ namespace BJSS.FileProcessing.Console
             var fileWatcher = new DefaultFileSystemWatcher(inputFolder, "*.xml");
 
             // Create file processor using default file system.
-            var fileProcessor = new FileProcessor(transformer, fileWatcher);
+            var fileProcessor = new FileProcessor(fileWatcher, transformer)
+            {
+                OutputLocation = new OutputLocation
+                {
+                    Path = outputFolder,
+                    NamingConvention = (path) => Path.GetFileNameWithoutExtension(path) + ".html"
+                }
+            };
 
             // Error handler.
             fileProcessor.Error = err =>
@@ -84,7 +91,7 @@ namespace BJSS.FileProcessing.Console
             };
 
             // Start file processor.
-            fileProcessor.Start(outputFolder);
+            fileProcessor.Start();
 
             System.Console.WriteLine("Press any key to stop");
             System.Console.WriteLine();

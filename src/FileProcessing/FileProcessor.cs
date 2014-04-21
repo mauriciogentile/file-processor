@@ -1,6 +1,7 @@
 ﻿using BJSS.FileProcessing.Util;
 using System;
 using System.IO;
+using Validation;
 
 namespace BJSS.FileProcessing
 {
@@ -13,7 +14,8 @@ namespace BJSS.FileProcessing
         readonly IFileWatcher _fileSystemWatcher;
         readonly IFileSystem _fileSystem;
         readonly IFileTransformer _fileTransformer;
-        string _outputPath;
+
+        public OutputLocation OutputLocation { get; set; }
 
         public Action<FileProcessedInfo> FileProcessed { get; set; }
         public Action Started { get; set; }
@@ -23,35 +25,19 @@ namespace BJSS.FileProcessing
         /// <summary>
         /// Creates an instance of the FileProcessor class using LocalFileSystem as default.
         /// </summary>
-        /// <param name="fileTransformer"><see cref="BJSS.FileProcessing.IFileTransformer"/></param>
-        /// <param name="fileSystemWatcher"><see cref="BJSS.FileProcessing.IFileWatcher"/></param>
-        public FileProcessor(IFileTransformer fileTransformer, IFileWatcher fileSystemWatcher)
-            : this(fileTransformer, fileSystemWatcher, new LocalFileSystem())
+        public FileProcessor(IFileWatcher fileSystemWatcher, IFileTransformer fileTransformer)
+            : this(fileSystemWatcher, fileTransformer, new LocalFileSystem())
         {
         }
 
         /// <summary>
         /// Creates an instance of the FileProcessor class.
         /// </summary>
-        /// <param name="fileTransformer"><see cref="BJSS.FileProcessing.IFileTransformer"/></param>
-        /// <param name="fileSystemWatcher"><see cref="BJSS.FileProcessing.IFileWatcher"/></param>
-        /// <param name="fileSystem"><see cref="BJSS.FileProcessing.IFileSystem"/></param>
-        public FileProcessor(IFileTransformer fileTransformer, IFileWatcher fileSystemWatcher, IFileSystem fileSystem)
+        public FileProcessor(IFileWatcher fileSystemWatcher, IFileTransformer fileTransformer, IFileSystem fileSystem)
         {
-            if (fileTransformer == null)
-            {
-                throw new ArgumentNullException("fileTransformer");
-            }
-
-            if (fileSystemWatcher == null)
-            {
-                throw new ArgumentNullException("fileSystemWatcher");
-            }
-
-            if (fileSystem == null)
-            {
-                throw new ArgumentNullException("fileSystem");
-            }
+            Requires.NotNull(fileTransformer, "fileTransformer");
+            Requires.NotNull(fileSystemWatcher, "fileSystemWatcher");
+            Requires.NotNull(fileSystem, "fileSystem");
 
             _fileSystem = fileSystem;
             _fileTransformer = fileTransformer;
@@ -62,24 +48,26 @@ namespace BJSS.FileProcessing
         }
 
         /// <summary>
-        /// Starts listening for files based on the file watcher parameters. <see cref="IFileWatcher"/>
+        /// Starts listening for files and process them.
         /// </summary>
-        /// <param name="outputPath">The destination location for the transformed files.</param>
-        public void Start(string outputPath)
+        public void Start()
         {
             lock (locker)
             {
-                if (!_fileSystem.LocationExists(outputPath))
+                if (OutputLocation == null)
                 {
-                    throw new DirectoryNotFoundException("'outputPath' is pointing to an unexisting folder or location.");
+                    throw new InvalidOperationException("'OutputLocation' has not been set.");
+                }
+
+                if (OutputLocation.Path == null || !_fileSystem.LocationExists(OutputLocation.Path))
+                {
+                    throw new DirectoryNotFoundException("'outputLocation' is pointing to an unexisting folder or location.");
                 }
 
                 if (_fileSystemWatcher.Enabled)
                 {
                     return;
                 }
-
-                _outputPath = outputPath;
 
                 _fileSystemWatcher.Enabled = true;
 
@@ -112,8 +100,11 @@ namespace BJSS.FileProcessing
         {
             try
             {
+                // Make sure it has a naming convention for the new file's name;
+                OutputLocation.NamingConvention = OutputLocation.NamingConvention ?? new Func<string, string>((path) => _fileSystem.GetFileName(path));
+                
                 // New file location for the output file.
-                string newFilePath = _fileSystem.Combine(_outputPath, _fileSystem.GetFileName(filePath));
+                string newFilePath = _fileSystem.Combine(OutputLocation.Path, OutputLocation.NamingConvention(filePath));
 
                 using (var stream = new MemoryStream())
                 {
@@ -122,6 +113,8 @@ namespace BJSS.FileProcessing
 
                     // Writes the stream on the file system.
                     _fileSystem.CreateFile(stream, newFilePath);
+
+                    // Releases stream.
                     stream.Close();
                 }
 

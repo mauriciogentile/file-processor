@@ -14,10 +14,13 @@ namespace BJSS.FileProcessing.Test
         Mock<IFileTransformer> _transformerMock;
         Mock<IFileWatcher> _fileWatcherMock;
         Mock<IFileSystem> _fileSystemMock;
+        OutputLocation _defaultOutputLocation;
 
         [SetUp]
         public void SetUp()
         {
+            _defaultOutputLocation = new OutputLocation { Path = Environment.CurrentDirectory };
+
             _transformerMock = new Mock<IFileTransformer>();
             _transformerMock.
                 Setup(x => x.Transform(It.IsAny<string>(), It.IsAny<Stream>()));
@@ -28,7 +31,7 @@ namespace BJSS.FileProcessing.Test
 
             _fileSystemMock = new Mock<IFileSystem>();
             _fileSystemMock.Setup(x => x.CreateFile(It.IsAny<Stream>(), It.IsAny<string>()));
-            _fileSystemMock.Setup(x => x.LocationExists(It.IsAny<string>())).Returns(true);
+            _fileSystemMock.Setup(x => x.LocationExists(It.IsAny<string>())).Returns<string>((path) => Directory.Exists(path));
             _fileSystemMock.Setup(x => x.Exists(It.IsAny<string>())).Returns(true);
             _fileSystemMock.Setup(x => x.GetFileName(It.IsAny<string>())).Returns<string>((path) => Path.GetFileName(path));
             _fileSystemMock.Setup(x => x.Combine(It.IsAny<string[]>())).Returns<string[]>((paths) => Path.Combine(paths));
@@ -36,35 +39,45 @@ namespace BJSS.FileProcessing.Test
 
         [Test]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void constructor_should_fail_if_first_argument_is_null()
+        public void constructor_should_fail_if_filewatcher_is_null()
         {
-            new FileProcessor(null, _fileWatcherMock.Object, _fileSystemMock.Object);
+            new FileProcessor(null, _transformerMock.Object, _fileSystemMock.Object);
         }
 
         [Test]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void constructor_should_fail_if_second_argument_is_null()
+        public void constructor_should_fail_if_transformer_is_null()
         {
-            new FileProcessor(_transformerMock.Object, null, _fileSystemMock.Object);
+            new FileProcessor(_fileWatcherMock.Object, null, _fileSystemMock.Object);
         }
 
         [Test]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void constructor_should_fail_if_third_argument_is_null()
+        public void constructor_should_fail_if_filesystem_is_null()
         {
-            new FileProcessor(_transformerMock.Object, _fileWatcherMock.Object, null);
+            new FileProcessor(_fileWatcherMock.Object, _transformerMock.Object, null);
+        }
+
+        [Test]
+        [ExpectedException(typeof(InvalidOperationException))]
+        public void start_should_fail_if_no_output_location_is_set()
+        {
+            var target = new FileProcessor(_fileWatcherMock.Object, _transformerMock.Object, _fileSystemMock.Object);
+
+            target.Start();
         }
 
         [Test]
         public void should_call_onstarted_handler_when_started_for_the_first_time()
         {
-            var target = new FileProcessor(_transformerMock.Object, _fileWatcherMock.Object, _fileSystemMock.Object);
+            var target = new FileProcessor(_fileWatcherMock.Object, _transformerMock.Object, _fileSystemMock.Object);
+            target.OutputLocation = _defaultOutputLocation;
 
             bool startedCalled = false;
 
             target.Started = () => { startedCalled = true; };
 
-            target.Start(Environment.CurrentDirectory);
+            target.Start();
 
             Assert.IsTrue(startedCalled);
         }
@@ -72,14 +85,15 @@ namespace BJSS.FileProcessing.Test
         [Test]
         public void should_not_call_onstarted_handler_when_started_twice()
         {
-            var target = new FileProcessor(_transformerMock.Object, _fileWatcherMock.Object, _fileSystemMock.Object);
+            var target = new FileProcessor(_fileWatcherMock.Object, _transformerMock.Object, _fileSystemMock.Object);
+            target.OutputLocation = _defaultOutputLocation;
 
             int startedCalledCount = 0;
 
             target.Started = () => { startedCalledCount++; };
 
-            target.Start(Environment.CurrentDirectory);
-            target.Start(Environment.CurrentDirectory);
+            target.Start();
+            target.Start();
 
             Assert.IsTrue(startedCalledCount == 1);
         }
@@ -87,13 +101,14 @@ namespace BJSS.FileProcessing.Test
         [Test]
         public void should_call_onstopped_handler_when_stopped()
         {
-            var target = new FileProcessor(_transformerMock.Object, _fileWatcherMock.Object, _fileSystemMock.Object);
+            var target = new FileProcessor(_fileWatcherMock.Object, _transformerMock.Object, _fileSystemMock.Object);
+            target.OutputLocation = _defaultOutputLocation;
 
             bool stoppedCalled = false;
 
             target.Stopped = () => { stoppedCalled = true; };
 
-            target.Start(Environment.CurrentDirectory);
+            target.Start();
             target.Stop();
 
             Assert.IsTrue(stoppedCalled);
@@ -102,13 +117,14 @@ namespace BJSS.FileProcessing.Test
         [Test]
         public void should_not_call_onstopped_handler_when_stopped_twice()
         {
-            var target = new FileProcessor(_transformerMock.Object, _fileWatcherMock.Object, _fileSystemMock.Object);
+            var target = new FileProcessor(_fileWatcherMock.Object, _transformerMock.Object, _fileSystemMock.Object);
+            target.OutputLocation = _defaultOutputLocation;
 
             int stoppedCalledCount = 0;
 
             target.Stopped = () => { stoppedCalledCount++; };
 
-            target.Start(Environment.CurrentDirectory);
+            target.Start();
             target.Stop();
             target.Stop();
 
@@ -116,26 +132,26 @@ namespace BJSS.FileProcessing.Test
         }
 
         [Test]
-        public void should_call_handle_error_if_process_fails()
+        public void should_call_error_callback_if_process_fails()
         {
-            var transformerMock = new Mock<IFileTransformer>();
-            transformerMock.
+            _transformerMock.
                 Setup(x => x.Transform(It.IsAny<string>(), It.IsAny<Stream>()))
                 .Throws(new InvalidOperationException());
 
             Exception expected = null;
 
-            var target = new FileProcessor(transformerMock.Object, _fileWatcherMock.Object, _fileSystemMock.Object)
+            var target = new FileProcessor(_fileWatcherMock.Object, _transformerMock.Object, _fileSystemMock.Object)
             {
+                OutputLocation = _defaultOutputLocation,
                 Error = exc =>
                 {
                     expected = exc;
                 }
             };
 
-            target.Start(Environment.CurrentDirectory);
+            target.Start();
 
-            var newFile = Path.Combine(Environment.CurrentDirectory, Guid.NewGuid() + ".temp.xml");
+            var newFile = Path.Combine(Guid.NewGuid() + ".temp.xml");
 
             Task.Factory.StartNew(() => _fileWatcherMock.Object.FileDetected(newFile)).Wait();
 
@@ -143,14 +159,15 @@ namespace BJSS.FileProcessing.Test
             Assert.IsNotNull(expected);
             Assert.AreEqual(expected.GetType(), typeof(ApplicationException));
             Assert.AreEqual(expected.InnerException.GetType(), typeof(InvalidOperationException));
-            transformerMock.Verify(x => x.Transform(It.IsAny<string>(), It.IsAny<Stream>()), Times.Once);
+            _transformerMock.Verify(x => x.Transform(It.IsAny<string>(), It.IsAny<Stream>()), Times.Once);
             _fileSystemMock.Verify(x => x.CreateFile(It.IsAny<Stream>(), It.IsAny<string>()), Times.Never);
         }
 
         [Test]
         public void should_call_file_detected_handler_after_processing()
         {
-            var target = new FileProcessor(_transformerMock.Object, _fileWatcherMock.Object, _fileSystemMock.Object);
+            var target = new FileProcessor(_fileWatcherMock.Object, _transformerMock.Object, _fileSystemMock.Object);
+            target.OutputLocation = _defaultOutputLocation;
 
             string actual = null;
 
@@ -162,7 +179,7 @@ namespace BJSS.FileProcessing.Test
                 reseter.Set();
             };
 
-            target.Start(Environment.CurrentDirectory);
+            target.Start();
 
             var newFile = Path.Combine(Environment.CurrentDirectory, Guid.NewGuid() + ".temp.xml");
             var fileName = Path.GetFileName(newFile);
@@ -177,9 +194,10 @@ namespace BJSS.FileProcessing.Test
         [Test]
         public void should_save_file_in_output_folder_after_tranformation()
         {
-            var target = new FileProcessor(_transformerMock.Object, _fileWatcherMock.Object, _fileSystemMock.Object);
+            var target = new FileProcessor(_fileWatcherMock.Object, _transformerMock.Object, _fileSystemMock.Object);
+            target.OutputLocation = _defaultOutputLocation;
 
-            target.Start(Environment.CurrentDirectory);
+            target.Start();
 
             var newFile = Path.Combine(Environment.CurrentDirectory, Guid.NewGuid() + ".temp.xml");
 
@@ -188,6 +206,25 @@ namespace BJSS.FileProcessing.Test
             // Assertions
             _transformerMock.Verify(x => x.Transform(It.IsAny<string>(), It.IsAny<Stream>()), Times.Once);
             _fileSystemMock.Verify(x => x.CreateFile(It.IsAny<Stream>(), newFile), Times.Once);
+        }
+
+        [Test]
+        public void should_create_new_files_using_naming_convention()
+        {
+            var target = new FileProcessor(_fileWatcherMock.Object, _transformerMock.Object, _fileSystemMock.Object);
+            target.OutputLocation = _defaultOutputLocation;
+            target.OutputLocation.NamingConvention = (path) => "MyConvention.xyz";
+
+            target.Start();
+
+            var newFile = Path.Combine(Environment.CurrentDirectory, Guid.NewGuid() + ".temp.xml");
+            var expectedNewFile = Path.Combine(Environment.CurrentDirectory, "MyConvention.xyz");
+
+            Task.Factory.StartNew(() => _fileWatcherMock.Object.FileDetected(newFile)).Wait();
+
+            // Assertions
+            _transformerMock.Verify(x => x.Transform(It.IsAny<string>(), It.IsAny<Stream>()), Times.Once);
+            _fileSystemMock.Verify(x => x.CreateFile(It.IsAny<Stream>(), expectedNewFile), Times.Once);
         }
     }
 }

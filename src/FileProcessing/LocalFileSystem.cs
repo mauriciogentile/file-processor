@@ -61,7 +61,7 @@ namespace BJSS.FileProcessing
         /// <param name="fileName">The new file to be created</param>
         public void CreateFile(Stream inputStream, string destinationPath)
         {
-            using (FileStream fileStream = new FileStream(destinationPath, FileMode.CreateNew))
+            using (FileStream fileStream = File.Create(destinationPath))
             {
                 inputStream.Seek(0, SeekOrigin.Begin);
                 inputStream.CopyTo(fileStream);

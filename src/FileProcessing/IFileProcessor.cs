@@ -8,7 +8,7 @@ namespace BJSS.FileProcessing
         Action Started { get; set; }
         Action Stopped { get; set; }
         Action<Exception> Error { get; set; }
-        void Start(string outputPath);
+        void Start();
         void Stop();
     }
 }
