@@ -32,10 +32,10 @@ namespace BJSS.FileProcessing.Test
 
             _fileSystemMock = new Mock<IFileSystem>();
             _fileSystemMock.Setup(x => x.CreateFile(It.IsAny<Stream>(), It.IsAny<string>()));
-            _fileSystemMock.Setup(x => x.LocationExists(It.IsAny<string>())).Returns<string>((path) => Directory.Exists(path));
+            _fileSystemMock.Setup(x => x.LocationExists(It.IsAny<string>())).Returns<string>(Directory.Exists);
             _fileSystemMock.Setup(x => x.Exists(It.IsAny<string>())).Returns(true);
-            _fileSystemMock.Setup(x => x.GetFileName(It.IsAny<string>())).Returns<string>((path) => Path.GetFileName(path));
-            _fileSystemMock.Setup(x => x.Combine(It.IsAny<string[]>())).Returns<string[]>((paths) => Path.Combine(paths));
+            _fileSystemMock.Setup(x => x.GetFileName(It.IsAny<string>())).Returns<string>(Path.GetFileName);
+            _fileSystemMock.Setup(x => x.Combine(It.IsAny<string[]>())).Returns<string[]>(Path.Combine);
         }
 
         [Test]
@@ -71,15 +71,13 @@ namespace BJSS.FileProcessing.Test
         [Test]
         public void should_call_onstarted_handler_when_started_for_the_first_time()
         {
+            bool startedCalled = false;
+
             var target = new FileProcessor(_fileWatcherMock.Object, _transformerMock.Object, _fileSystemMock.Object)
             {
                 OutputLocation = _defaultOutputLocation
             };
-
-            bool startedCalled = false;
-
             target.Started += delegate { startedCalled = true; };
-
             target.Start();
 
             Assert.IsTrue(startedCalled);
@@ -88,13 +86,12 @@ namespace BJSS.FileProcessing.Test
         [Test]
         public void should_not_call_onstarted_handler_when_try_to_start_it_multiple_times()
         {
+            int startedCalledCount = 0;
+
             var target = new FileProcessor(_fileWatcherMock.Object, _transformerMock.Object, _fileSystemMock.Object)
             {
                 OutputLocation = _defaultOutputLocation
             };
-
-            int startedCalledCount = 0;
-
             target.Started += delegate { startedCalledCount++; };
 
             var tasks = new List<Task>();
@@ -112,13 +109,12 @@ namespace BJSS.FileProcessing.Test
         [Test]
         public void should_call_onstopped_handler_when_stopped()
         {
+            bool stoppedCalled = false;
+
             var target = new FileProcessor(_fileWatcherMock.Object, _transformerMock.Object, _fileSystemMock.Object)
             {
                 OutputLocation = _defaultOutputLocation
             };
-
-            bool stoppedCalled = false;
-
             target.Stopped += delegate { stoppedCalled = true; };
 
             target.Start();
@@ -130,15 +126,14 @@ namespace BJSS.FileProcessing.Test
         [Test]
         public void should_not_call_onstopped_handler_when_try_to_stop_it_multiple_times()
         {
+            int stoppedCalledCount = 0;
+
             var target = new FileProcessor(_fileWatcherMock.Object, _transformerMock.Object, _fileSystemMock.Object)
             {
                 OutputLocation = _defaultOutputLocation
             };
 
-            int stoppedCalledCount = 0;
-
             target.Stopped += delegate { stoppedCalledCount++; };
-
             target.Start();
 
             var tasks = new List<Task>();
@@ -189,14 +184,14 @@ namespace BJSS.FileProcessing.Test
         [Test]
         public void should_call_file_detected_handler_after_processing()
         {
+            string actual = null;
+
+            var reseter = new AutoResetEvent(false);
+
             var target = new FileProcessor(_fileWatcherMock.Object, _transformerMock.Object, _fileSystemMock.Object)
             {
                 OutputLocation = _defaultOutputLocation
             };
-
-            string actual = null;
-
-            var reseter = new AutoResetEvent(false);
 
             target.FileProcessed += delegate(object sender, FileProcessedEventArgs arg)
             {
@@ -242,7 +237,6 @@ namespace BJSS.FileProcessing.Test
                 OutputLocation = _defaultOutputLocation
             };
             target.OutputLocation.NamingConvention = (path) => "MyConvention.xyz";
-
             target.Start();
 
             var newFile = Path.Combine(Environment.CurrentDirectory, Guid.NewGuid() + ".temp.xml");
