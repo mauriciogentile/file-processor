@@ -83,12 +83,11 @@ namespace BJSS.FileProcessing
                     }
 
                     _fileSystemWatcher.EnableRaisingEvents = true;
-                    
-                    if (Started != null)
-                    {
-                        Started(this, EventArgs.Empty);
-                    }
                 }
+				if (Started != null)
+				{
+					Started(this, EventArgs.Empty);
+				}
             }
         }
 
@@ -104,12 +103,11 @@ namespace BJSS.FileProcessing
                     }
 
                     _fileSystemWatcher.EnableRaisingEvents = false;
-
-                    if (Stopped != null)
-                    {
-                        Stopped(this, EventArgs.Empty);
-                    }
                 }
+				if (Stopped != null)
+				{
+					Stopped(this, EventArgs.Empty);
+				}
             }
         }
 
