@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Threading;
 using NUnit.Framework;
 using System.Reflection;
 
@@ -42,7 +43,7 @@ namespace BJSS.FileProcessing.Test
         {
             var target = new LocalFileSystem();
 
-            var expected = "Momo.txt";
+            const string expected = "Momo.txt";
             var actual = target.GetFileName(Environment.CurrentDirectory + "\\Momo.txt");
 
             Assert.AreEqual(expected, actual);
@@ -51,7 +52,7 @@ namespace BJSS.FileProcessing.Test
         [Test]
         public void should_create_a_new_file_given_a_stream()
         {
-            using (var stream = new MemoryStream())
+            var stream = new MemoryStream();
             {
                 using (var writer = new StreamWriter(stream))
                 {
@@ -61,9 +62,14 @@ namespace BJSS.FileProcessing.Test
                     var file = Guid.NewGuid().ToString();
 
                     var target = new LocalFileSystem();
+
                     target.CreateFile(stream, file);
 
-                    FileAssert.AreEqual(stream, File.Open(file, FileMode.Open));
+                    // Wait until process releases the new file.
+                    Thread.Sleep(500);
+
+                    // Compare streams.
+                    FileAssert.AreEqual(stream, File.Open(file, FileMode.Open, FileAccess.Read, FileShare.Read));
                 }
             }
         }

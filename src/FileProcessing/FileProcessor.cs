@@ -15,12 +15,23 @@ namespace BJSS.FileProcessing
         readonly IFileSystem _fileSystem;
         readonly IFileTransformer _fileTransformer;
 
-        public OutputLocation OutputLocation { get; set; }
+        /// <summary>
+        /// Occurs when a file is detected by the <see cref="BJSS.FileProcessing.IFileSystem"/> and then processed.
+        /// </summary>
+        public event EventHandler<FileProcessedEventArgs> FileProcessed;
+        
+        /// <summary>
+        /// Occurs when there is an error processing a file.
+        /// </summary>
+        public event ErrorEventHandler Error;
+        
+        public event EventHandler Started;
+        public event EventHandler Stopped;
 
-        public Action<FileProcessedInfo> FileProcessed { get; set; }
-        public Action Started { get; set; }
-        public Action Stopped { get; set; }
-        public Action<Exception> Error { get; set; }
+        /// <summary>
+        /// Sets up output path and naming convention for new generated files.
+        /// </summary>
+        public OutputLocation OutputLocation { get; set; }
 
         /// <summary>
         /// Creates an instance of the FileProcessor class using LocalFileSystem as default.
@@ -44,7 +55,7 @@ namespace BJSS.FileProcessing
             _fileSystemWatcher = fileSystemWatcher;
 
             // Subscribe to file detection.
-            _fileSystemWatcher.FileDetected = filePath => ProcessFile(filePath);
+            _fileSystemWatcher.FileDetected = ProcessFile;
         }
 
         /// <summary>
@@ -54,6 +65,11 @@ namespace BJSS.FileProcessing
         {
             lock (locker)
             {
+                if (_fileSystemWatcher.EnableRaisingEvents)
+                {
+                    return;
+                }
+
                 if (OutputLocation == null)
                 {
                     throw new InvalidOperationException("'OutputLocation' has not been set.");
@@ -64,16 +80,11 @@ namespace BJSS.FileProcessing
                     throw new DirectoryNotFoundException("'outputLocation' is pointing to an unexisting folder or location.");
                 }
 
-                if (_fileSystemWatcher.Enabled)
-                {
-                    return;
-                }
-
-                _fileSystemWatcher.Enabled = true;
+                _fileSystemWatcher.EnableRaisingEvents = true;
 
                 if (Started != null)
                 {
-                    Started();
+                    Started(this, EventArgs.Empty);
                 }
             }
         }
@@ -82,16 +93,16 @@ namespace BJSS.FileProcessing
         {
             lock (locker)
             {
-                if (!_fileSystemWatcher.Enabled)
+                if (!_fileSystemWatcher.EnableRaisingEvents)
                 {
                     return;
                 }
 
-                _fileSystemWatcher.Enabled = false;
+                _fileSystemWatcher.EnableRaisingEvents = false;
 
                 if (Stopped != null)
                 {
-                    Stopped();
+                    Stopped(this, EventArgs.Empty);
                 }
             }
         }
@@ -102,7 +113,7 @@ namespace BJSS.FileProcessing
             {
                 // Make sure it has a naming convention for the new file's name;
                 OutputLocation.NamingConvention = OutputLocation.NamingConvention ?? new Func<string, string>((path) => _fileSystem.GetFileName(path));
-                
+
                 // New file location for the output file.
                 string newFilePath = _fileSystem.Combine(OutputLocation.Path, OutputLocation.NamingConvention(filePath));
 
@@ -121,14 +132,14 @@ namespace BJSS.FileProcessing
                 if (FileProcessed != null)
                 {
                     // Emits input and output file locations.
-                    FileProcessed(new FileProcessedInfo(filePath, newFilePath));
+                    FileProcessed(this, new FileProcessedEventArgs(filePath, newFilePath));
                 }
             }
             catch (Exception exc)
             {
                 if (Error != null)
                 {
-                    Error(new ApplicationException("Error processing file '" + filePath + "'.", exc));
+                    Error(this, new ErrorEventArgs(new ApplicationException("Error processing file '" + filePath + "'.", exc)));
                 }
             }
         }

@@ -44,14 +44,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DefaultFileSystemWatcher.cs" />
-    <Compile Include="FileProcessedInfo.cs" />
+    <Compile Include="FileProcessedEventArgs.cs" />
     <Compile Include="LocalFileSystem.cs" />
-    <Compile Include="IFileProcessor.cs" />
-    <Compile Include="IFileWatcher.cs" />
-    <Compile Include="IFileSystem.cs" />
+    <Compile Include="Interfaces\IFileProcessor.cs" />
+    <Compile Include="Interfaces\IFileWatcher.cs" />
+    <Compile Include="Interfaces\IFileSystem.cs" />
     <Compile Include="OutputLocation.cs" />
     <Compile Include="Util\Disposable.cs" />
-    <Compile Include="IFileTransformer.cs" />
+    <Compile Include="Interfaces\IFileTransformer.cs" />
     <Compile Include="FileProcessor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Xml\DefaultXmlFileTransformer.cs" />

@@ -1,11 +1,10 @@
 ﻿using System;
-using System.IO;
 
 namespace BJSS.FileProcessing
 {
     public interface IFileWatcher : IDisposable
     {
-        bool Enabled { get; set; }
+        bool EnableRaisingEvents { get; set; }
         Action<string> FileDetected { get; set; }
     }
 }

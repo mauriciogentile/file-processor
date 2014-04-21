@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace BJSS.FileProcessing
 {
-    public class FileProcessedInfo
+    public class FileProcessedEventArgs : EventArgs
     {
-        public FileProcessedInfo(string inputFile, string outputFile)
+        public FileProcessedEventArgs(string inputFile, string outputFile)
         {
             InputFile = inputFile;
             OutputFile = outputFile;

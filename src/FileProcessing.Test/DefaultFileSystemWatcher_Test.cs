@@ -13,20 +13,24 @@ namespace BJSS.FileProcessing.Test
         [ExpectedException(typeof(ArgumentException))]
         public void should_fail_if_folder_is_not_specified()
         {
-            var target = new DefaultFileSystemWatcher(null);
-            target.Enabled = true;
+            new DefaultFileSystemWatcher(null)
+            {
+                EnableRaisingEvents = true
+            };
         }
 
         [Test]
         public void should_detect_new_files_in_folder_if_enabled()
         {
-            var target = new DefaultFileSystemWatcher(Environment.CurrentDirectory);
-            target.Enabled = true;
+            var target = new DefaultFileSystemWatcher(Environment.CurrentDirectory)
+            {
+                EnableRaisingEvents = true
+            };
 
             string newFile = Path.Combine(Environment.CurrentDirectory, Guid.NewGuid() + ".xml");
             string actual = null;
 
-            AutoResetEvent reseter = new AutoResetEvent(false);
+            var reseter = new AutoResetEvent(false);
 
             target.FileDetected = file =>
             {
@@ -38,19 +42,23 @@ namespace BJSS.FileProcessing.Test
 
             reseter.WaitOne(2000);
 
+            target.Dispose();
+
             Assert.AreEqual(newFile, actual);
         }
 
         [Test]
         public void should_not_detect_new_files_in_folder_if_not_enabled()
         {
-            var target = new DefaultFileSystemWatcher(Environment.CurrentDirectory);
-            target.Enabled = false;
+            var target = new DefaultFileSystemWatcher(Environment.CurrentDirectory)
+            {
+                EnableRaisingEvents = false
+            };
 
             string newFile = Guid.NewGuid() + ".xml";
             string expected = null;
 
-            AutoResetEvent reseter = new AutoResetEvent(false);
+            var reseter = new AutoResetEvent(false);
 
             target.FileDetected = file =>
             {
@@ -62,20 +70,24 @@ namespace BJSS.FileProcessing.Test
 
             reseter.WaitOne(2000);
 
+            target.Dispose();
+
             Assert.IsNull(expected);
         }
 
         [Test]
         public void should_detect_renamed_files_in_folder()
         {
-            var target = new DefaultFileSystemWatcher(Environment.CurrentDirectory, "*.xml");
-            target.Enabled = true;
+            var target = new DefaultFileSystemWatcher(Environment.CurrentDirectory, "*.xml")
+            {
+                EnableRaisingEvents = true
+            };
 
             string newFile = Path.Combine(Environment.CurrentDirectory, Guid.NewGuid() + ".nonxml");
-            string renamedFile = newFile.Replace("nonxml", "xml");
+            string renamedFile = Path.Combine(Environment.CurrentDirectory, Guid.NewGuid() + ".renamed.xml");
             string actual = null;
 
-            AutoResetEvent reseter = new AutoResetEvent(false);
+            var reseter = new AutoResetEvent(false);
 
             target.FileDetected = file =>
             {
@@ -89,20 +101,24 @@ namespace BJSS.FileProcessing.Test
 
             reseter.WaitOne(3000);
 
+            target.Dispose();
+
             Assert.AreEqual(renamedFile, actual);
         }
 
         [Test]
         public void should_not_detect_files_if_disposed()
         {
-            var target = new DefaultFileSystemWatcher(Environment.CurrentDirectory);
-            target.Enabled = true;
+            var target = new DefaultFileSystemWatcher(Environment.CurrentDirectory)
+            {
+                EnableRaisingEvents = true
+            };
 
             string newFile0 = Path.Combine(Environment.CurrentDirectory, Guid.NewGuid() + ".xml");
             string newFile1 = Path.Combine(Environment.CurrentDirectory, Guid.NewGuid() + ".xml");
             string actual = null;
 
-            AutoResetEvent reseter = new AutoResetEvent(false);
+            var reseter = new AutoResetEvent(false);
 
             target.FileDetected = file =>
             {

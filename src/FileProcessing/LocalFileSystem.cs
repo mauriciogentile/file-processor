@@ -9,14 +9,6 @@ namespace BJSS.FileProcessing
     public class LocalFileSystem : IFileSystem
     {
         /// <summary>
-        /// Creates an instance of the LocalFileSystem class.
-        /// </summary>
-        /// <param name="folderPath">The folder to be written</param>
-        public LocalFileSystem()
-        {
-        }
-
-        /// <summary>
         /// Determines wether the file exists.
         /// </summary>
         /// <param name="filePath"></param>
@@ -58,10 +50,10 @@ namespace BJSS.FileProcessing
         /// Creates or overrides a file in the specified path.
         /// </summary>
         /// <param name="inputStream">The content</param>
-        /// <param name="fileName">The new file to be created</param>
+        /// <param name="destinationPath">The new file to be created</param>
         public void CreateFile(Stream inputStream, string destinationPath)
         {
-            using (FileStream fileStream = File.Create(destinationPath))
+            using (var fileStream = new FileStream(destinationPath, FileMode.CreateNew, FileAccess.Write, FileShare.Read))
             {
                 inputStream.Seek(0, SeekOrigin.Begin);
                 inputStream.CopyTo(fileStream);

@@ -44,6 +44,22 @@ namespace BJSS.FileProcessing.Console
                 xsltFile = "books-to-html.xslt";
             }
 
+            var fileProcessor = BuildProcessor(inputFolder, xsltFile, outputFolder);
+
+            // Start processinf files.
+            fileProcessor.Start();
+
+            System.Console.WriteLine("Press any key to stop");
+            System.Console.WriteLine();
+            System.Console.ReadLine();
+
+            fileProcessor.Stop();
+
+            Thread.Sleep(1000);
+        }
+
+        static FileProcessor BuildProcessor(string inputFolder, string xsltFile, string outputFolder)
+        {
             // Define an xml file transformer.
             var transformer = new DefaultXmlFileTransformer(xsltFile);
 
@@ -56,27 +72,27 @@ namespace BJSS.FileProcessing.Console
                 OutputLocation = new OutputLocation
                 {
                     Path = outputFolder,
-                    NamingConvention = (path) => Path.GetFileNameWithoutExtension(path) + ".html"
+                    NamingConvention = path => Path.GetFileNameWithoutExtension(path) + ".html"
                 }
             };
 
             // Error handler.
-            fileProcessor.Error = err =>
+            fileProcessor.Error += delegate(object sender, ErrorEventArgs arg)
             {
                 System.Console.ForegroundColor = ConsoleColor.Red;
-                System.Console.WriteLine(err);
+                System.Console.WriteLine(arg.GetException());
                 System.Console.ResetColor();
             };
 
             // File processing handler.
-            fileProcessor.FileProcessed = fileInfo =>
+            fileProcessor.FileProcessed += delegate(object sender, FileProcessedEventArgs arg)
             {
                 System.Console.ForegroundColor = ConsoleColor.Blue;
-                System.Console.WriteLine(fileInfo.InputFile);
+                System.Console.WriteLine(arg.InputFile);
                 System.Console.ResetColor();
             };
 
-            fileProcessor.Started = () =>
+            fileProcessor.Started += delegate
             {
                 System.Console.ForegroundColor = ConsoleColor.Green;
                 System.Console.WriteLine("Listening for files...");
@@ -84,22 +100,13 @@ namespace BJSS.FileProcessing.Console
                 System.Console.ResetColor();
             };
 
-            fileProcessor.Stopped = () =>
+            fileProcessor.Stopped += delegate
             {
                 System.Console.WriteLine("Process stopped!");
                 System.Console.WriteLine();
             };
 
-            // Start file processor.
-            fileProcessor.Start();
-
-            System.Console.WriteLine("Press any key to stop");
-            System.Console.WriteLine();
-            System.Console.ReadLine();
-
-            fileProcessor.Stop();
-
-            Thread.Sleep(1000);
+            return fileProcessor;
         }
     }
 }

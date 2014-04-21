@@ -24,10 +24,10 @@ namespace BJSS.FileProcessing
             {
                 NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName,
                 Path = folderPath,
-                Filter = filters
+                Filter = filters,
+                IncludeSubdirectories = includeSubdirectories
             };
 
-            _fileSystemWatcher.IncludeSubdirectories = includeSubdirectories;
             _fileSystemWatcher.Created += _fileSystemWatcher_Created;
             _fileSystemWatcher.Renamed += _fileSystemWatcher_Renamed;
         }
@@ -40,7 +40,7 @@ namespace BJSS.FileProcessing
         /// <summary>
         /// Gets or sets a value indicating wether the component is enabled.
         /// </summary>
-        public bool Enabled
+        public bool EnableRaisingEvents
         {
             get { return _fileSystemWatcher.EnableRaisingEvents; }
             set { _fileSystemWatcher.EnableRaisingEvents = value; }
@@ -66,7 +66,7 @@ namespace BJSS.FileProcessing
                 while (IsFileLocked(filePath) && tries >= 0)
                 {
                     tries--;
-                    Thread.Sleep(100);
+                    Thread.Sleep(10);
                 }
                 
                 // If file still locked let the process to fail and emit error.
