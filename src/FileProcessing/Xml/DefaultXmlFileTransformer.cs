@@ -3,6 +3,7 @@ using System.IO;
 using System.Xml;
 using System.Xml.XPath;
 using System.Xml.Xsl;
+using Validation;
 
 namespace BJSS.FileProcessing.Xml
 {
@@ -20,10 +21,7 @@ namespace BJSS.FileProcessing.Xml
         /// <exception cref="System.IO.FileNotFoundException"></exception>
         public DefaultXmlFileTransformer(string xsltFilePath)
         {
-            if (xsltFilePath == null)
-            {
-                throw new ArgumentNullException("xsltFilePath");
-            }
+            Requires.NotNullOrEmpty(xsltFilePath, "xsltFilePath");
 
             if (!File.Exists(xsltFilePath))
             {

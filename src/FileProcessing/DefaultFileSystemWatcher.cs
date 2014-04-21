@@ -2,6 +2,7 @@
 using System.IO;
 using BJSS.FileProcessing.Util;
 using System.Threading;
+using Validation;
 
 namespace BJSS.FileProcessing
 {
@@ -20,6 +21,9 @@ namespace BJSS.FileProcessing
         /// <param name="includeSubdirectories">Gets or sets a value indicating whether subdirectories within the specified path should be monitored.</param>
         public DefaultFileSystemWatcher(string folderPath, string filters = "*.*", bool includeSubdirectories = false)
         {
+            Requires.NotNullOrEmpty(folderPath, "folderPath");
+            Requires.NotNullOrEmpty(filters, "filters");
+
             _fileSystemWatcher = new FileSystemWatcher
             {
                 NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName,
