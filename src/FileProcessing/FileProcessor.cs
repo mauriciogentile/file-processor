@@ -63,46 +63,52 @@ namespace BJSS.FileProcessing
         /// </summary>
         public void Start()
         {
-            lock (locker)
+            if (!_fileSystemWatcher.EnableRaisingEvents)
             {
-                if (_fileSystemWatcher.EnableRaisingEvents)
+                lock (locker)
                 {
-                    return;
-                }
+                    if (_fileSystemWatcher.EnableRaisingEvents)
+                    {
+                        return;
+                    }
 
-                if (OutputLocation == null)
-                {
-                    throw new InvalidOperationException("'OutputLocation' has not been set.");
-                }
+                    if (OutputLocation == null)
+                    {
+                        throw new InvalidOperationException("'OutputLocation' has not been set.");
+                    }
 
-                if (OutputLocation.Path == null || !_fileSystem.LocationExists(OutputLocation.Path))
-                {
-                    throw new DirectoryNotFoundException("'outputLocation' is pointing to an unexisting folder or location.");
-                }
+                    if (OutputLocation.Path == null || !_fileSystem.LocationExists(OutputLocation.Path))
+                    {
+                        throw new DirectoryNotFoundException("'outputLocation' is pointing to an unexisting folder or location.");
+                    }
 
-                _fileSystemWatcher.EnableRaisingEvents = true;
-
-                if (Started != null)
-                {
-                    Started(this, EventArgs.Empty);
+                    _fileSystemWatcher.EnableRaisingEvents = true;
+                    
+                    if (Started != null)
+                    {
+                        Started(this, EventArgs.Empty);
+                    }
                 }
             }
         }
 
         public void Stop()
         {
-            lock (locker)
+            if (_fileSystemWatcher.EnableRaisingEvents)
             {
-                if (!_fileSystemWatcher.EnableRaisingEvents)
+                lock (locker)
                 {
-                    return;
-                }
+                    if (!_fileSystemWatcher.EnableRaisingEvents)
+                    {
+                        return;
+                    }
 
-                _fileSystemWatcher.EnableRaisingEvents = false;
+                    _fileSystemWatcher.EnableRaisingEvents = false;
 
-                if (Stopped != null)
-                {
-                    Stopped(this, EventArgs.Empty);
+                    if (Stopped != null)
+                    {
+                        Stopped(this, EventArgs.Empty);
+                    }
                 }
             }
         }

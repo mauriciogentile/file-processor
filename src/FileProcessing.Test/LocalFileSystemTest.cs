@@ -7,7 +7,7 @@ using System.Reflection;
 namespace BJSS.FileProcessing.Test
 {
     [TestFixture]
-    public class LocalFileSystem_Test
+    public class LocalFileSystemTest
     {
         [Test]
         public void exists_should_return_true_if_file_exist()

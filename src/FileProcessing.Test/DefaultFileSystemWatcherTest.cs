@@ -7,10 +7,10 @@ using NUnit.Framework;
 namespace BJSS.FileProcessing.Test
 {
     [TestFixture]
-    public class DefaultFileSystemWatcher_Test
+    public class DefaultFileSystemWatcherTest
     {
         [Test]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ArgumentNullException))]
         public void should_fail_if_folder_is_not_specified()
         {
             new DefaultFileSystemWatcher(null)

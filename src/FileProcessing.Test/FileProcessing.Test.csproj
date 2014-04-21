@@ -53,10 +53,10 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
-    <Compile Include="LocalFileSystem_Test.cs" />
-    <Compile Include="DefaultFileSystemWatcher_Test.cs" />
+    <Compile Include="LocalFileSystemTest.cs" />
+    <Compile Include="DefaultFileSystemWatcherTest.cs" />
     <Compile Include="Xml\DefaultXmlFileTransformer_Test.cs" />
-    <Compile Include="FileProcessor_Test.cs" />
+    <Compile Include="FileProcessorTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

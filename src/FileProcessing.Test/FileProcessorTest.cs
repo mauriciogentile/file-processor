@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using BJSS.FileProcessing.Xml;
@@ -9,7 +10,7 @@ using System.Threading;
 namespace BJSS.FileProcessing.Test
 {
     [TestFixture]
-    public class FileProcessor_Test
+    public class FileProcessorTest
     {
         Mock<IFileTransformer> _transformerMock;
         Mock<IFileWatcher> _fileWatcherMock;
@@ -85,7 +86,7 @@ namespace BJSS.FileProcessing.Test
         }
 
         [Test]
-        public void should_not_call_onstarted_handler_when_started_twice()
+        public void should_not_call_onstarted_handler_when_try_to_start_it_multiple_times()
         {
             var target = new FileProcessor(_fileWatcherMock.Object, _transformerMock.Object, _fileSystemMock.Object)
             {
@@ -96,9 +97,15 @@ namespace BJSS.FileProcessing.Test
 
             target.Started += delegate { startedCalledCount++; };
 
-            target.Start();
-            target.Start();
+            var tasks = new List<Task>();
 
+            for (int i = 0; i < 10; i++)
+            {
+                tasks.Add(Task.Factory.StartNew(target.Start));
+            }
+
+            Task.WaitAll(tasks.ToArray());
+            
             Assert.IsTrue(startedCalledCount == 1);
         }
 
@@ -121,7 +128,7 @@ namespace BJSS.FileProcessing.Test
         }
 
         [Test]
-        public void should_not_call_onstopped_handler_when_stopped_twice()
+        public void should_not_call_onstopped_handler_when_try_to_stop_it_multiple_times()
         {
             var target = new FileProcessor(_fileWatcherMock.Object, _transformerMock.Object, _fileSystemMock.Object)
             {
@@ -133,9 +140,16 @@ namespace BJSS.FileProcessing.Test
             target.Stopped += delegate { stoppedCalledCount++; };
 
             target.Start();
-            target.Stop();
-            target.Stop();
 
+            var tasks = new List<Task>();
+
+            for (int i = 0; i < 10; i++)
+            {
+                tasks.Add(Task.Factory.StartNew(target.Stop));
+            }
+
+            Task.WaitAll(tasks.ToArray());
+            
             Assert.AreEqual(stoppedCalledCount, 1);
         }
 
