@@ -29,7 +29,7 @@ namespace BJSS.FileProcessing
         public event EventHandler Stopped;
 
         /// <summary>
-        /// Sets up output path and naming convention for new generated files.
+        /// Sets up the output path and naming convention for new generated files.
         /// </summary>
         public OutputLocation OutputLocation { get; set; }
 
