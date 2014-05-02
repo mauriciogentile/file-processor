@@ -1,0 +1,11 @@
+/src/FileProcessing/bin
+/src/FileProcessing/obj
+
+/src/FileProcessing.Console/bin
+
+/src/FileProcessing.Console/obj
+
+/src/FileProcessing.Test/obj
+
+/src/FileProcessing.Test/bin
+/src/*.suo

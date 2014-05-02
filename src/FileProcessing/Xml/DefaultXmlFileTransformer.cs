@@ -5,7 +5,7 @@ using System.Xml.XPath;
 using System.Xml.Xsl;
 using Validation;
 
-namespace BJSS.FileProcessing.Xml
+namespace Ringo.FileProcessing.Xml
 {
     /// <summary>
     /// Transforms an input file into a xslt transformation using the XslCompiledTransform class. <see cref="System.Xml.Xsl.XslCompiledTransform"/>

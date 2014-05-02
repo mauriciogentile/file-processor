@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace BJSS.FileProcessing
+namespace Ringo.FileProcessing
 {
     /// <summary>
     /// A class that wraps a file system write operation.

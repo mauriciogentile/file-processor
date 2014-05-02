@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace BJSS.FileProcessing.Util
+namespace Ringo.FileProcessing.Util
 {
     public abstract class Disposable : IDisposable
     {

@@ -1,9 +1,9 @@
-﻿using BJSS.FileProcessing.Util;
+﻿using Ringo.FileProcessing.Util;
 using System;
 using System.IO;
 using Validation;
 
-namespace BJSS.FileProcessing
+namespace Ringo.FileProcessing
 {
     /// <summary>
     /// A component for processing and transform files using pluggable transformers, file watchers and file writers.
@@ -16,7 +16,7 @@ namespace BJSS.FileProcessing
         readonly IFileTransformer _fileTransformer;
 
         /// <summary>
-        /// Occurs when a file is detected by the <see cref="BJSS.FileProcessing.IFileSystem"/> and then processed.
+        /// Occurs when a file is detected by the <see cref="Ringo.FileProcessing.IFileSystem"/> and then processed.
         /// </summary>
         public event EventHandler<FileProcessedEventArgs> FileProcessed;
         
@@ -84,10 +84,10 @@ namespace BJSS.FileProcessing
 
                     _fileSystemWatcher.EnableRaisingEvents = true;
                 }
-				if (Started != null)
-				{
-					Started(this, EventArgs.Empty);
-				}
+                if (Started != null)
+                {
+                    Started(this, EventArgs.Empty);
+                }
             }
         }
 
@@ -104,10 +104,10 @@ namespace BJSS.FileProcessing
 
                     _fileSystemWatcher.EnableRaisingEvents = false;
                 }
-				if (Stopped != null)
-				{
-					Stopped(this, EventArgs.Empty);
-				}
+                if (Stopped != null)
+                {
+                    Stopped(this, EventArgs.Empty);
+                }
             }
         }
 

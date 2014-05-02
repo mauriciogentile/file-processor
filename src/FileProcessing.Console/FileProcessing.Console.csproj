@@ -7,8 +7,8 @@
     <ProjectGuid>{2D1211F9-F0DA-422D-948B-13CFDE8DF130}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>BJSS.FileProcessing.Console</RootNamespace>
-    <AssemblyName>BJSS.FileProcessing.Console</AssemblyName>
+    <RootNamespace>Ringo.FileProcessing.Console</RootNamespace>
+    <AssemblyName>Ringo.FileProcessing.Console</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace BJSS.FileProcessing
+namespace Ringo.FileProcessing
 {
     public interface IFileTransformer
     {

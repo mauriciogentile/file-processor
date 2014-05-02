@@ -1,10 +1,10 @@
 ﻿using System;
 using System.IO;
-using BJSS.FileProcessing.Util;
+using Ringo.FileProcessing.Util;
 using System.Threading;
 using Validation;
 
-namespace BJSS.FileProcessing
+namespace Ringo.FileProcessing
 {
     /// <summary>
     /// A FileSystemWatcher that wraps the FileSystemWatcher class. <see cref="System.IO.FileSystemWatcher"/>

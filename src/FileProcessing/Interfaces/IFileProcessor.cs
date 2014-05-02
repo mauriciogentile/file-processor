@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace BJSS.FileProcessing
+namespace Ringo.FileProcessing
 {
     public interface IFileProcessor
     {

@@ -4,7 +4,7 @@ using System.Threading;
 using NUnit.Framework;
 using System.Reflection;
 
-namespace BJSS.FileProcessing.Test
+namespace Ringo.FileProcessing.Test
 {
     [TestFixture]
     public class LocalFileSystemTest

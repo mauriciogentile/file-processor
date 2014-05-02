@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace BJSS.FileProcessing
+namespace Ringo.FileProcessing
 {
     public class OutputLocation
     {

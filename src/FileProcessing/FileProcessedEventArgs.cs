@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace BJSS.FileProcessing
+namespace Ringo.FileProcessing
 {
     public class FileProcessedEventArgs : EventArgs
     {

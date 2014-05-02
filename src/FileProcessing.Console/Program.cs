@@ -1,10 +1,10 @@
 ﻿using System;
 using System.IO;
-using BJSS.FileProcessing.Xml;
-using BJSS.FileProcessing;
+using Ringo.FileProcessing.Xml;
+using Ringo.FileProcessing;
 using System.Threading;
 
-namespace BJSS.FileProcessing.Console
+namespace Ringo.FileProcessing.Console
 {
     class Program
     {

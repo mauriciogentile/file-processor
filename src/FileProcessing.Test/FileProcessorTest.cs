@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using BJSS.FileProcessing.Xml;
+using Ringo.FileProcessing.Xml;
 using Moq;
 using NUnit.Framework;
 using System.Threading;
 
-namespace BJSS.FileProcessing.Test
+namespace Ringo.FileProcessing.Test
 {
     [TestFixture]
     public class FileProcessorTest

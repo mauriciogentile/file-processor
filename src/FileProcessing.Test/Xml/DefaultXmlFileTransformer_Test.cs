@@ -1,9 +1,9 @@
 ﻿using System;
 using System.IO;
-using BJSS.FileProcessing.Xml;
+using Ringo.FileProcessing.Xml;
 using NUnit.Framework;
 
-namespace BJSS.FileProcessing.Test.Xml
+namespace Ringo.FileProcessing.Test.Xml
 {
     [TestFixture]
     public class DefaultXmlFileTransformer_Test
