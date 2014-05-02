@@ -19,12 +19,11 @@ namespace Ringo.FileProcessing
         /// Occurs when a file is detected by the <see cref="Ringo.FileProcessing.IFileSystem"/> and then processed.
         /// </summary>
         public event EventHandler<FileProcessedEventArgs> FileProcessed;
-        
+
         /// <summary>
         /// Occurs when there is an error processing a file.
         /// </summary>
         public event ErrorEventHandler Error;
-        
         public event EventHandler Started;
         public event EventHandler Stopped;
 
@@ -63,6 +62,16 @@ namespace Ringo.FileProcessing
         /// </summary>
         public void Start()
         {
+            if (OutputLocation == null)
+            {
+                throw new InvalidOperationException("'OutputLocation' has not been set.");
+            }
+
+            if (OutputLocation.Path == null || !_fileSystem.LocationExists(OutputLocation.Path))
+            {
+                throw new DirectoryNotFoundException("'outputLocation' is pointing to an unexisting folder or location.");
+            }
+
             if (!_fileSystemWatcher.EnableRaisingEvents)
             {
                 lock (locker)
@@ -70,16 +79,6 @@ namespace Ringo.FileProcessing
                     if (_fileSystemWatcher.EnableRaisingEvents)
                     {
                         return;
-                    }
-
-                    if (OutputLocation == null)
-                    {
-                        throw new InvalidOperationException("'OutputLocation' has not been set.");
-                    }
-
-                    if (OutputLocation.Path == null || !_fileSystem.LocationExists(OutputLocation.Path))
-                    {
-                        throw new DirectoryNotFoundException("'outputLocation' is pointing to an unexisting folder or location.");
                     }
 
                     _fileSystemWatcher.EnableRaisingEvents = true;
